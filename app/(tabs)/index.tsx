@@ -1,98 +1,113 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import TheraCareLogo from "@/components/TheraCareLogo";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const C = {
+  primary:      "#8B5CF6",
+  primaryLight: "#EDE9FE",
+  primaryMid:   "#C4B5FD",
+  teal:         "#2A9D8F",
+  tealLight:    "#CCFBF1",
+  tealMid:      "#5EBFB5",
+  text:         "#1E1B2E",
+  muted:        "#7C6F9F",
+  bg:           "#F8F6FF",
+  bgCard:       "#FFFFFF",
+  white:        "#FFFFFF",
+  border:       "#E5E0FF",
+};
 
-export default function HomeScreen() {
+export default function WelcomeScreen() {
+  const router = useRouter();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ScrollView contentContainerStyle={styles.container}>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {/* Logo */}
+      <View style={styles.logoWrap}>
+        <TheraCareLogo size="large" showTagline />
+      </View>
+
+      {/* Hero text */}
+      <View style={styles.heroWrap}>
+        <Text style={styles.heroTitle}>
+          Your mental health{"\n"}journey starts here 💜
+        </Text>
+        <Text style={styles.heroSub}>
+          A safe, confidential space where healing begins
+          and growth continues — for users and therapists alike.
+        </Text>
+      </View>
+
+      {/* Features row */}
+      <View style={styles.featuresRow}>
+        {[
+          { icon: "🤖", label: "AI Support" },
+          { icon: "👨‍⚕️", label: "Real Therapists" },
+          { icon: "📓", label: "Journaling" },
+          { icon: "😊", label: "Mood Tracking" },
+        ].map(f => (
+          <View key={f.label} style={styles.featureItem}>
+            <Text style={styles.featureIcon}>{f.icon}</Text>
+            <Text style={styles.featureLabel}>{f.label}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Cards */}
+      <Text style={styles.chooseText}>How would you like to continue?</Text>
+
+      {/* User card */}
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => router.push("/user/auth")}
+        activeOpacity={0.85}
+      >
+        <View style={styles.cardIconWrap}>
+          <Text style={styles.cardIcon}>🙋</Text>
+        </View>
+        <Text style={styles.cardTitle}>Continue as User</Text>
+        <Text style={styles.cardArrow}>→</Text>
+      </TouchableOpacity>
+
+      {/* Therapist card */}
+      <TouchableOpacity
+        style={[styles.card, styles.cardTeal]}
+        onPress={() => router.push("/therapist/auth")}
+        activeOpacity={0.85}
+      >
+        <View style={[styles.cardIconWrap, { backgroundColor: C.tealLight }]}>
+          <Text style={styles.cardIcon}>👨‍⚕️</Text>
+        </View>
+        <Text style={[styles.cardTitle, { color: C.teal }]}>Continue as Therapist</Text>
+        <Text style={[styles.cardArrow, { color: C.teal }]}>→</Text>
+      </TouchableOpacity>
+
+      {/* Footer */}
+      <Text style={styles.footer}>
+        🔒 Your data is private, encrypted and secure
+      </Text>
+
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  container:    { flexGrow: 1, alignItems: "center", padding: 24, backgroundColor: C.bg, paddingTop: 60 },
+  logoWrap:     { marginBottom: 32, alignItems: "center" },
+  heroWrap:     { alignItems: "center", marginBottom: 28 },
+  heroTitle:    { fontSize: 28, fontWeight: "800", color: C.text, textAlign: "center", lineHeight: 38, marginBottom: 12 },
+  heroSub:      { fontSize: 15, color: C.muted, textAlign: "center", lineHeight: 22 },
+  featuresRow:  { flexDirection: "row", gap: 10, marginBottom: 32 },
+  featureItem:  { alignItems: "center", backgroundColor: C.white, borderRadius: 16, padding: 14, flex: 1, shadowColor: C.primary, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2, borderWidth: 1, borderColor: C.border },
+  featureIcon:  { fontSize: 24, marginBottom: 6 },
+  featureLabel: { fontSize: 11, fontWeight: "700", color: C.muted, textAlign: "center" },
+  chooseText:   { fontSize: 14, fontWeight: "700", color: C.text, marginBottom: 12, alignSelf: "center" },
+  card:         { width: "75%", backgroundColor: C.white, padding: 14, borderRadius: 16, marginBottom: 12, flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1.5, borderColor: C.border, alignSelf: "center", shadowColor: C.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
+  cardTeal:     { borderColor: C.tealLight },
+  cardIconWrap: { width: 40, height: 40, borderRadius: 12, backgroundColor: C.primaryLight, alignItems: "center", justifyContent: "center" },
+  cardIcon:     { fontSize: 20 },
+  cardTitle:    { flex: 1, fontSize: 14, fontWeight: "800", color: C.primary },
+  cardArrow:    { fontSize: 16, color: C.primary, fontWeight: "800" },
+  footer:       { fontSize: 13, color: C.muted, marginTop: 24, textAlign: "center" },
 });
