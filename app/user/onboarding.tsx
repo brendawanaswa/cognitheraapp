@@ -1,21 +1,26 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, SafeAreaView,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
-  primary:      "#7C3AED",
+  primary: "#7C3AED",
   primaryLight: "#EDE9FE",
-  primaryMid:   "#DDD6FE",
-  accent:       "#A78BFA",
-  text:         "#1F1F1F",
-  muted:        "#6B7280",
-  bg:           "#FAF8FF",
-  white:        "#FFFFFF",
-  border:       "#F0EEFF",
+  primaryMid: "#DDD6FE",
+  accent: "#A78BFA",
+  text: "#1F1F1F",
+  muted: "#6B7280",
+  bg: "#FAF8FF",
+  white: "#FFFFFF",
+  border: "#F0EEFF",
 };
 
 const questions = [
@@ -40,15 +45,35 @@ const questions = [
     title: "What brings you here today?",
     subtitle: "Select all that apply — there's no wrong answer.",
     type: "multi",
-    options: ["Anxiety", "Depression", "Stress", "Relationship issues", "Grief & loss", "Trauma", "Self-esteem", "Family conflict", "Sleep problems", "Loneliness"],
+    options: [
+      "Anxiety",
+      "Depression",
+      "Stress",
+      "Relationship issues",
+      "Grief & loss",
+      "Trauma",
+      "Self-esteem",
+      "Family conflict",
+      "Sleep problems",
+      "Loneliness",
+    ],
     emoji: "💭",
   },
   {
     id: "religion",
     title: "Does faith or spirituality play a role in your life?",
-    subtitle: "We can match you with therapists who understand your background.",
+    subtitle:
+      "We can match you with therapists who understand your background.",
     type: "single",
-    options: ["Christianity", "Islam", "Hinduism", "Buddhism", "Judaism", "Other faith", "Secular / No preference"],
+    options: [
+      "Christianity",
+      "Islam",
+      "Hinduism",
+      "Buddhism",
+      "Judaism",
+      "Other faith",
+      "Secular / No preference",
+    ],
     emoji: "🕊️",
   },
   {
@@ -72,30 +97,35 @@ const questions = [
     title: "Have you been to therapy before?",
     subtitle: "This helps us personalize your experience.",
     type: "single",
-    options: ["Yes, regularly", "Yes, a few times", "No, this is my first time"],
+    options: [
+      "Yes, regularly",
+      "Yes, a few times",
+      "No, this is my first time",
+    ],
     emoji: "🌱",
   },
 ];
 
 export default function Onboarding() {
   const router = useRouter();
-  const [current, setCurrent]       = useState(0);
-  const [answers, setAnswers]       = useState<Record<string, string | string[]>>({});
-  const [completed, setCompleted]   = useState(false);
+  const insets = useSafeAreaInsets();
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [completed, setCompleted] = useState(false);
 
-  const q        = questions[current];
+  const q = questions[current];
   const progress = current / questions.length;
 
   const toggle = (option: string) => {
     if (q.type === "single") {
-      setAnswers(prev => ({ ...prev, [q.id]: option }));
+      setAnswers((prev) => ({ ...prev, [q.id]: option }));
     } else {
-      setAnswers(prev => {
+      setAnswers((prev) => {
         const existing = (prev[q.id] as string[]) || [];
         return {
           ...prev,
           [q.id]: existing.includes(option)
-            ? existing.filter(o => o !== option)
+            ? existing.filter((o) => o !== option)
             : [...existing, option],
         };
       });
@@ -118,14 +148,14 @@ export default function Onboarding() {
   const next = () => {
     if (!canProceed()) return;
     if (current < questions.length - 1) {
-      setCurrent(c => c + 1);
+      setCurrent((c) => c + 1);
     } else {
       setCompleted(true);
     }
   };
 
   const back = () => {
-    if (current > 0) setCurrent(c => c - 1);
+    if (current > 0) setCurrent((c) => c - 1);
   };
 
   // ── COMPLETION SCREEN ──
@@ -134,12 +164,14 @@ export default function Onboarding() {
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.completionScroll}>
           <Text style={styles.completionEmoji}>🌟</Text>
-          <Text style={styles.completionTitle}>You're all set, welcome to TheraCare!</Text>
+          <Text style={styles.completionTitle}>
+            You&apos;re all set, welcome to TheraCare!
+          </Text>
           <Text style={styles.completionSub}>
-            We're finding therapists that match your needs. This usually takes just a moment.
+            We&apos;re finding therapists that match your needs. This usually
+            takes just a moment.
           </Text>
 
-          {/* Summary */}
           <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>YOUR SUMMARY</Text>
             {Object.entries(answers).map(([key, val]) => (
@@ -153,14 +185,14 @@ export default function Onboarding() {
           </View>
 
           <TouchableOpacity
-  style={styles.matchBtn}
-  onPress={async () => {
-    await AsyncStorage.setItem("onboarding_complete", "true");
-    router.replace("/user/mood-tracker");
-  }}
->
-  <Text style={styles.matchBtnText}>Get Started 🎉</Text>
-</TouchableOpacity>
+            style={styles.matchBtn}
+            onPress={async () => {
+              await AsyncStorage.setItem("onboarding_complete", "true");
+              router.replace("/user/mood-tracker");
+            }}
+          >
+            <Text style={styles.matchBtnText}>Get Started 🎉</Text>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     );
@@ -169,27 +201,31 @@ export default function Onboarding() {
   // ── QUESTION SCREEN ──
   return (
     <SafeAreaView style={styles.safe}>
-
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={styles.logo}>thera<Text style={{ color: C.text }}>care</Text></Text>
-          <Text style={styles.counter}>{current + 1} / {questions.length}</Text>
+          <Text style={styles.logo}>
+            thera<Text style={{ color: C.text }}>care</Text>
+          </Text>
+          <Text style={styles.counter}>
+            {current + 1} / {questions.length}
+          </Text>
         </View>
-        {/* Progress bar */}
         <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+          <View
+            style={[styles.progressFill, { width: `${progress * 100}%` }]}
+          />
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-
-        {/* Emoji box */}
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.emojiBox}>
           <Text style={styles.emojiText}>{q.emoji}</Text>
         </View>
 
-        {/* Question */}
         <Text style={styles.questionTitle}>{q.title}</Text>
         <Text style={styles.questionSub}>{q.subtitle}</Text>
 
@@ -199,9 +235,13 @@ export default function Onboarding() {
           </View>
         )}
 
-        {/* Options */}
-        <View style={[styles.optionsGrid, q.options.length > 5 && styles.optionsGridTwo]}>
-          {q.options.map(option => {
+        <View
+          style={[
+            styles.optionsGrid,
+            q.options.length > 5 && styles.optionsGridTwo,
+          ]}
+        >
+          {q.options.map((option) => {
             const selected = isSelected(option);
             return (
               <TouchableOpacity
@@ -210,18 +250,22 @@ export default function Onboarding() {
                 style={[styles.option, selected && styles.optionSelected]}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
+                <Text
+                  style={[
+                    styles.optionText,
+                    selected && styles.optionTextSelected,
+                  ]}
+                >
                   {option}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </View>
-
       </ScrollView>
 
       {/* Navigation */}
-      <View style={styles.navRow}>
+      <View style={[styles.navRow, { paddingBottom: insets.bottom + 16 }]}>
         {current > 0 && (
           <TouchableOpacity onPress={back} style={styles.backBtn}>
             <Text style={styles.backBtnText}>← Back</Text>
@@ -238,47 +282,178 @@ export default function Onboarding() {
           </Text>
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe:               { flex: 1, backgroundColor: C.bg },
-  header:             { backgroundColor: C.white, padding: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: C.border },
-  headerTop:          { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
-  logo:               { fontSize: 20, fontWeight: "800", color: C.primary },
-  counter:            { fontSize: 13, color: C.muted },
-  progressTrack:      { height: 6, backgroundColor: C.primaryLight, borderRadius: 99, overflow: "hidden" },
-  progressFill:       { height: 6, backgroundColor: C.primary, borderRadius: 99 },
-  scroll:             { padding: 24, paddingBottom: 40 },
-  emojiBox:           { width: 64, height: 64, backgroundColor: C.primaryLight, borderRadius: 20, alignItems: "center", justifyContent: "center", marginBottom: 20 },
-  emojiText:          { fontSize: 30 },
-  questionTitle:      { fontSize: 24, fontWeight: "700", color: C.text, marginBottom: 8, lineHeight: 32 },
-  questionSub:        { fontSize: 15, color: C.muted, lineHeight: 22, marginBottom: 8 },
-  multiTag:           { alignSelf: "flex-start", backgroundColor: C.primaryLight, borderRadius: 99, paddingHorizontal: 12, paddingVertical: 4, marginBottom: 16 },
-  multiTagText:       { fontSize: 12, color: C.primary, fontWeight: "600" },
-  optionsGrid:        { flexDirection: "column", gap: 10, marginTop: 16 },
-  optionsGridTwo:     { flexDirection: "row", flexWrap: "wrap" },
-  option:             { backgroundColor: C.white, borderWidth: 2, borderColor: "#EFEFEF", borderRadius: 14, padding: 14, marginBottom: 4 },
-  optionSelected:     { backgroundColor: C.primary, borderColor: C.primary },
-  optionText:         { fontSize: 14, fontWeight: "500", color: C.text },
+  safe: { flex: 1, backgroundColor: C.bg },
+  header: {
+    backgroundColor: C.white,
+    padding: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+  },
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  logo: { fontSize: 20, fontWeight: "800", color: C.primary },
+  counter: { fontSize: 13, color: C.muted },
+  progressTrack: {
+    height: 6,
+    backgroundColor: C.primaryLight,
+    borderRadius: 99,
+    overflow: "hidden",
+  },
+  progressFill: { height: 6, backgroundColor: C.primary, borderRadius: 99 },
+  scroll: { padding: 24, paddingBottom: 40 },
+  emojiBox: {
+    width: 64,
+    height: 64,
+    backgroundColor: C.primaryLight,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  emojiText: { fontSize: 30 },
+  questionTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: C.text,
+    marginBottom: 8,
+    lineHeight: 32,
+  },
+  questionSub: {
+    fontSize: 15,
+    color: C.muted,
+    lineHeight: 22,
+    marginBottom: 8,
+  },
+  multiTag: {
+    alignSelf: "flex-start",
+    backgroundColor: C.primaryLight,
+    borderRadius: 99,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginBottom: 16,
+  },
+  multiTagText: { fontSize: 12, color: C.primary, fontWeight: "600" },
+  optionsGrid: { flexDirection: "column", gap: 10, marginTop: 16 },
+  optionsGridTwo: { flexDirection: "row", flexWrap: "wrap" },
+  option: {
+    backgroundColor: C.white,
+    borderWidth: 2,
+    borderColor: "#EFEFEF",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 4,
+  },
+  optionSelected: { backgroundColor: C.primary, borderColor: C.primary },
+  optionText: { fontSize: 14, fontWeight: "500", color: C.text },
   optionTextSelected: { color: C.white, fontWeight: "700" },
-  navRow:             { flexDirection: "row", gap: 12, padding: 16, backgroundColor: C.white, borderTopWidth: 1, borderTopColor: C.border },
-  backBtn:            { flex: 1, padding: 16, backgroundColor: C.white, borderWidth: 2, borderColor: C.border, borderRadius: 14, alignItems: "center" },
-  backBtnText:        { fontSize: 15, fontWeight: "600", color: C.muted },
-  nextBtn:            { flex: 3, padding: 16, backgroundColor: C.primary, borderRadius: 14, alignItems: "center", shadowColor: C.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 8, elevation: 4 },
-  nextBtnDisabled:    { backgroundColor: "#E5E5E5", shadowOpacity: 0, elevation: 0 },
-  nextBtnText:        { fontSize: 15, fontWeight: "700", color: C.white },
-  completionScroll:   { padding: 24, alignItems: "center", paddingBottom: 60 },
-  completionEmoji:    { fontSize: 72, marginBottom: 24, marginTop: 40 },
-  completionTitle:    { fontSize: 28, fontWeight: "800", color: C.text, textAlign: "center", marginBottom: 12, lineHeight: 36 },
-  completionSub:      { fontSize: 15, color: C.muted, textAlign: "center", lineHeight: 22, marginBottom: 32 },
-  summaryCard:        { backgroundColor: C.white, borderRadius: 20, padding: 20, width: "100%", marginBottom: 32, shadowColor: C.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
-  summaryLabel:       { fontSize: 12, fontWeight: "700", color: C.accent, letterSpacing: 1, marginBottom: 16 },
-  summaryRow:         { flexDirection: "row", justifyContent: "space-between", paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: C.border },
-  summaryKey:         { fontSize: 14, color: C.muted, textTransform: "capitalize" },
-  summaryVal:         { fontSize: 14, fontWeight: "600", color: C.text, flex: 1, textAlign: "right", marginLeft: 12 },
-  matchBtn:           { backgroundColor: C.primary, borderRadius: 50, paddingVertical: 16, paddingHorizontal: 48, shadowColor: C.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 6 },
-  matchBtnText:       { fontSize: 16, fontWeight: "700", color: C.white },
+  navRow: {
+    flexDirection: "row",
+    gap: 12,
+    padding: 16,
+    backgroundColor: C.white,
+    borderTopWidth: 1,
+    borderTopColor: C.border,
+  },
+  backBtn: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: C.white,
+    borderWidth: 2,
+    borderColor: C.border,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+  backBtnText: { fontSize: 15, fontWeight: "600", color: C.muted },
+  nextBtn: {
+    flex: 3,
+    padding: 16,
+    backgroundColor: C.primary,
+    borderRadius: 14,
+    alignItems: "center",
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  nextBtnDisabled: {
+    backgroundColor: "#E5E5E5",
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  nextBtnText: { fontSize: 15, fontWeight: "700", color: C.white },
+  completionScroll: { padding: 24, alignItems: "center", paddingBottom: 60 },
+  completionEmoji: { fontSize: 72, marginBottom: 24, marginTop: 40 },
+  completionTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: C.text,
+    textAlign: "center",
+    marginBottom: 12,
+    lineHeight: 36,
+  },
+  completionSub: {
+    fontSize: 15,
+    color: C.muted,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  summaryCard: {
+    backgroundColor: C.white,
+    borderRadius: 20,
+    padding: 20,
+    width: "100%",
+    marginBottom: 32,
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: C.accent,
+    letterSpacing: 1,
+    marginBottom: 16,
+  },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: C.border,
+  },
+  summaryKey: { fontSize: 14, color: C.muted, textTransform: "capitalize" },
+  summaryVal: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: C.text,
+    flex: 1,
+    textAlign: "right",
+    marginLeft: 12,
+  },
+  matchBtn: {
+    backgroundColor: C.primary,
+    borderRadius: 50,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  matchBtnText: { fontSize: 16, fontWeight: "700", color: C.white },
 });

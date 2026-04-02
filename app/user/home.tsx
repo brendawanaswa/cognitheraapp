@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, SafeAreaView, Modal,
+  StyleSheet, Modal,
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TheraCareLogo from "@/components/TheraCareLogo";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
   primary:      "#7C3AED",
@@ -33,7 +34,8 @@ const MENU_ITEMS = [
 ];
 
 export default function Home() {
-  const router = useRouter();
+  const router  = useRouter();
+  const insets  = useSafeAreaInsets();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userName, setUserName] = useState("");
 
@@ -45,6 +47,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("user_name");
+    await AsyncStorage.removeItem("user_token");
     await AsyncStorage.removeItem("onboarding_complete");
     router.replace("/user/auth");
   };
@@ -55,10 +58,10 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
 
       {/* NAV */}
-      <View style={styles.nav}>
+      <View style={[styles.nav, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.hamburger}>
           <View style={styles.bar} />
           <View style={styles.bar} />
@@ -79,7 +82,7 @@ export default function Home() {
       >
         <View style={styles.overlay}>
           <TouchableOpacity style={styles.overlayBg} onPress={() => setMenuOpen(false)} />
-          <View style={styles.drawer}>
+          <View style={[styles.drawer, { paddingTop: insets.top + 20 }]}>
             <View style={styles.drawerHeader}>
               <TheraCareLogo size="small" />
               <TouchableOpacity onPress={() => setMenuOpen(false)}>
@@ -87,7 +90,6 @@ export default function Home() {
               </TouchableOpacity>
             </View>
 
-            {/* User greeting in drawer */}
             <View style={styles.drawerProfile}>
               <View style={styles.drawerAvatar}>
                 <Text style={styles.drawerAvatarText}>
@@ -158,7 +160,6 @@ export default function Home() {
 
         <View style={styles.cardsGrid}>
 
-          {/* Talk to Therapist */}
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: C.primary }]}
             onPress={() => router.push("/user/matching")}
@@ -166,10 +167,8 @@ export default function Home() {
           >
             <Text style={styles.actionCardIcon}>👨‍⚕️</Text>
             <Text style={styles.actionCardTitle}>Talk to a{"\n"}Therapist</Text>
-            <Text style={styles.actionCardArrow}>→</Text>
           </TouchableOpacity>
 
-          {/* AI Chatbot */}
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: C.accent }]}
             onPress={() => router.push("/user/chatbot")}
@@ -177,10 +176,8 @@ export default function Home() {
           >
             <Text style={styles.actionCardIcon}>🤖</Text>
             <Text style={styles.actionCardTitle}>AI{"\n"}Chatbot</Text>
-            <Text style={styles.actionCardArrow}>→</Text>
           </TouchableOpacity>
 
-          {/* Journal */}
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: C.green }]}
             onPress={() => router.push("/user/journal")}
@@ -188,10 +185,8 @@ export default function Home() {
           >
             <Text style={styles.actionCardIcon}>📓</Text>
             <Text style={styles.actionCardTitle}>My{"\n"}Journal</Text>
-            <Text style={styles.actionCardArrow}>→</Text>
           </TouchableOpacity>
 
-          {/* Mood Tracker */}
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: C.orange }]}
             onPress={() => router.push("/user/mood-tracker")}
@@ -199,7 +194,6 @@ export default function Home() {
           >
             <Text style={styles.actionCardIcon}>😊</Text>
             <Text style={styles.actionCardTitle}>Mood{"\n"}Tracker</Text>
-            <Text style={styles.actionCardArrow}>→</Text>
           </TouchableOpacity>
 
         </View>
@@ -213,22 +207,20 @@ export default function Home() {
         </View>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safe:               { flex: 1, backgroundColor: C.bg },
-  nav:                { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16, backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border },
-  hamburger:          { width: 40, gap: 5, padding: 4 },
+  nav:                { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 12, backgroundColor: C.white, borderBottomWidth: 1, borderBottomColor: C.border },
+  hamburger:          { width: 44, height: 44, justifyContent: "center", gap: 5 },
   bar:                { height: 3, backgroundColor: C.primary, borderRadius: 99 },
-  notifBtn:           { padding: 4 },
+  notifBtn:           { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   notifIcon:          { fontSize: 22 },
-
-  // Drawer
   overlay:            { flex: 1, flexDirection: "row" },
   overlayBg:          { flex: 1, backgroundColor: "rgba(0,0,0,0.4)" },
-  drawer:             { width: 280, backgroundColor: C.white, paddingTop: 20, paddingBottom: 40, paddingHorizontal: 20 },
+  drawer:             { width: 280, backgroundColor: C.white, paddingBottom: 40, paddingHorizontal: 20 },
   drawerHeader:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
   closeBtn:           { fontSize: 18, color: C.muted },
   drawerProfile:      { flexDirection: "row", alignItems: "center", gap: 12, padding: 16, backgroundColor: C.primaryLight, borderRadius: 16, marginBottom: 20 },
@@ -242,29 +234,20 @@ const styles = StyleSheet.create({
   logoutBtn:          { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, marginTop: 20 },
   logoutIcon:         { fontSize: 22 },
   logoutText:         { fontSize: 16, fontWeight: "700", color: C.primary },
-
-  // Content
   scroll:             { padding: 16, paddingBottom: 80 },
   greetingCard:       { backgroundColor: C.primary, borderRadius: 24, padding: 24, marginBottom: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   greetingHello:      { fontSize: 24, fontWeight: "800", color: C.white, marginBottom: 6 },
   greetingSub:        { fontSize: 14, color: "rgba(255,255,255,0.75)" },
   greetingEmoji:      { width: 64, height: 64, borderRadius: 32, backgroundColor: "rgba(255,255,255,0.15)", alignItems: "center", justifyContent: "center" },
-
-  // Stats
   statsRow:           { flexDirection: "row", gap: 10, marginBottom: 24 },
   statCard:           { flex: 1, backgroundColor: C.white, borderRadius: 16, padding: 14, alignItems: "center", shadowColor: C.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 2 },
   statValue:          { fontSize: 18, fontWeight: "800", color: C.primary, marginBottom: 4 },
   statLabel:          { fontSize: 11, color: C.muted, textAlign: "center", fontWeight: "600" },
-
-  // Action cards
   sectionTitle:       { fontSize: 18, fontWeight: "800", color: C.text, marginBottom: 14 },
   cardsGrid:          { flexDirection: "row", flexWrap: "wrap", gap: 12, marginBottom: 20 },
   actionCard:         { width: "47%", borderRadius: 20, padding: 20, minHeight: 130, justifyContent: "space-between", shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 4 },
   actionCardIcon:     { fontSize: 32 },
   actionCardTitle:    { fontSize: 16, fontWeight: "800", color: C.white, lineHeight: 22 },
-  actionCardArrow:    { fontSize: 18, color: "rgba(255,255,255,0.7)", fontWeight: "800", alignSelf: "flex-end" },
-
-  // Tip
   tipCard:            { backgroundColor: C.primaryLight, borderRadius: 20, padding: 20, borderWidth: 1.5, borderColor: C.primaryMid },
   tipLabel:           { fontSize: 13, fontWeight: "800", color: C.primary, marginBottom: 8 },
   tipText:            { fontSize: 14, color: C.text, lineHeight: 22 },

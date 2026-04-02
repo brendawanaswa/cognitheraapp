@@ -1,4 +1,6 @@
-const BASE_URL = "http://192.168.1.101:5000/api";
+const BASE_URL = "https://theracare-backend-production.up.railway.app/api";
+
+const API_KEY = process.env.API_KEY || process.env.api_key || "";
 
 export const api = {
   // Auth
@@ -27,6 +29,7 @@ export const api = {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        ...(API_KEY ? { "x-api-key": API_KEY } : {}),
       },
       body: JSON.stringify({ messages, userName }),
     });
@@ -85,6 +88,11 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+    return res.json();
+  },
+
+  getTherapists: async () => {
+    const res = await fetch(`${BASE_URL}/therapists`);
     return res.json();
   },
 

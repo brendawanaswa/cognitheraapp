@@ -37,7 +37,8 @@ export default function Matching() {
       {/* Text */}
       <Text style={styles.title}>Finding the right therapist for you...</Text>
       <Text style={styles.subtitle}>
-        We're analyzing your responses to match you with the best support 💜
+        We&apos;re analyzing your responses to match you with the best support
+        💜
       </Text>
 
       {/* Animated dots */}

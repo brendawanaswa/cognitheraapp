@@ -2,7 +2,7 @@
   "expo": {
     "name": "TheraCare",
     "slug": "TheraCare",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "theracare",
@@ -44,7 +44,8 @@
       "router": {},
       "eas": {
         "projectId": "2edbb8f8-1da2-4b76-ba5d-f4f7a3a710fa"
-      }
+      },
+      "apiKey": ""
     },
     "owner": "tepsy"
   }

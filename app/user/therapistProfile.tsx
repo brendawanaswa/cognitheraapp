@@ -115,13 +115,8 @@ export default function TherapistProfile() {
   const [bookModal, setBookModal]             = useState(false);
 
   const handleBook = () => {
-    if (selectedSession === "Video call") {
-      router.push("/user/video-call" as any);
-    } else {
-      setBookModal(true);
-    }
-  };
-
+  setBookModal(true);
+};
   return (
     <SafeAreaView style={styles.safe}>
 
